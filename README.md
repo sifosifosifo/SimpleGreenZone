@@ -104,6 +104,3 @@ Config.AllowedWeapons = {
 }
 ```
 
-## Author
-
-Sifo
