@@ -2,6 +2,8 @@
 
 Simple Green Zone System for QBCore.
 
+![Preview](preview.png)
+
 ## Features
 
 - Create Green Zones using waypoint
