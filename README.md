@@ -137,14 +137,7 @@ The system will automatically protect every location using that blip.
 
 You can find all available FiveM Blip IDs here:
 
-:contentReference[oaicite:0]{index=0}
-
-Alternative reference:
-
-:contentReference[oaicite:1]{index=1}
-
-These references contain all map icons and their IDs that can be used with Blip Zones. :contentReference[oaicite:2]{index=2}
-
+https://docs.fivem.net/docs/game-references/blips/
 ---
 
 # ⚙️ Dependencies
