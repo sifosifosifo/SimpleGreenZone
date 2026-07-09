@@ -8,7 +8,9 @@ local inside = false
 local blockedWeapon = false
 local currentZone = nil
 
-
+-------------------------------------------------
+-- Notify
+-------------------------------------------------
 local function Notify(msg, type)
 
     if not Config.EnableZoneNotify then
@@ -22,7 +24,9 @@ local function Notify(msg, type)
 
 end
 
-
+-------------------------------------------------
+-- Draw Text
+-------------------------------------------------
 function DrawTxt(text, x, y)
 
     SetTextFont(4)
@@ -41,7 +45,9 @@ function DrawTxt(text, x, y)
 
 end
 
-
+-------------------------------------------------
+-- HUD Default
+-------------------------------------------------
 CreateThread(function()
 
     Wait(3000)
@@ -53,6 +59,9 @@ CreateThread(function()
 
 end)
 
+-------------------------------------------------
+-- طلب المناطق
+-------------------------------------------------
 CreateThread(function()
 
     Wait(2000)
@@ -63,14 +72,44 @@ CreateThread(function()
 
 end)
 
-
+-------------------------------------------------
+-- تحديث المناطق
+-------------------------------------------------
 RegisterNetEvent("greenzone:update", function(data)
 
-    zones = data
+    zones = {}
 
+    for _, zone in pairs(data) do
+
+        -- منطقة عادية
+        if zone.type ~= "blip" then
+            table.insert(zones, zone)
+
+        -- منطقة Blip
+        else
+            local blip = GetFirstBlipInfoId(zone.blipId)
+
+            while DoesBlipExist(blip) do
+
+                table.insert(zones, {
+                    id = zone.id,
+                    name = zone.name,
+                    type = "blip",
+                    blipId = zone.blipId,
+                    coords = GetBlipInfoIdCoord(blip),
+                    radius = zone.radius,
+                    enabled = zone.enabled
+                })
+
+                blip = GetNextBlipInfoId(zone.blipId)
+            end
+        end
+    end
 end)
 
-
+-------------------------------------------------
+-- القائمة الرئيسية
+-------------------------------------------------
 RegisterCommand("gz", function()
 
     QBCore.Functions.TriggerCallback(
@@ -96,11 +135,17 @@ RegisterCommand("gz", function()
                 },
 
                 {
-                    header = "🟢 "..Lang['create_zone'],
+                   header = "📍 Create Waypoint Zone",
+                   params = {
+                        event = "greenzone:createCoordsMenu"
+                     }
+                 },
 
+               {
+                    header = "🗺️ Create Blip Zone",
                     params = {
-                        event = "greenzone:createMenu"
-                    }
+                      event = "greenzone:createBlipMenu"
+                       }
                 },
 
                 {
@@ -118,8 +163,10 @@ RegisterCommand("gz", function()
 
 end)
 
-
-RegisterNetEvent("greenzone:createMenu", function()
+-------------------------------------------------
+-- إنشاء منطقة
+-------------------------------------------------
+RegisterNetEvent("greenzone:createCoordsMenu", function()
 
     local input = exports['qb-input']:ShowInput({
 
@@ -215,10 +262,13 @@ RegisterNetEvent("greenzone:createMenu", function()
 
 end)
 
-
+-------------------------------------------------
+-- إدارة المناطق
+-------------------------------------------------
 RegisterNetEvent("greenzone:manageMenu", function()
 
     local menu = {}
+    local seenZones = {}
 
     table.insert(menu, {
 
@@ -229,29 +279,34 @@ RegisterNetEvent("greenzone:manageMenu", function()
 
     for _, z in pairs(zones) do
 
-        table.insert(menu, {
+        if z and z.id and not seenZones[z.id] then
 
-            header = z.name,
+            seenZones[z.id] = true
 
-            txt =
-                "ID: "..z.id..
-                " | Radius: "..z.radius..
-                " | "..(
-                    z.enabled and
-                    "🟢 Enabled"
-                    or
-                    "🔴 Disabled"
-                ),
+            table.insert(menu, {
 
-            params = {
+                header = z.name,
 
-                event = "greenzone:options",
+                txt =
+                    "ID: "..z.id..
+                    " | Radius: "..z.radius..
+                    " | "..(
+                        z.enabled and
+                        "🟢 Enabled"
+                        or
+                        "🔴 Disabled"
+                    ),
 
-                args = z
+                params = {
 
-            }
+                    event = "greenzone:options",
 
-        })
+                    args = z
+
+                }
+
+            })
+        end
 
     end
 
@@ -259,7 +314,9 @@ RegisterNetEvent("greenzone:manageMenu", function()
 
 end)
 
-
+-------------------------------------------------
+-- خيارات المنطقة
+-------------------------------------------------
 RegisterNetEvent("greenzone:options", function(zone)
 
     exports['qb-menu']:openMenu({
@@ -314,7 +371,9 @@ RegisterNetEvent("greenzone:options", function(zone)
 
 end)
 
-
+-------------------------------------------------
+-- تعديل Radius
+-------------------------------------------------
 RegisterNetEvent("greenzone:editRadius", function(zone)
 
     local input = exports['qb-input']:ShowInput({
@@ -347,21 +406,22 @@ RegisterNetEvent("greenzone:editRadius", function(zone)
 
 end)
 
+-------------------------------------------------
+-- النظام الرئيسي
+-------------------------------------------------
 CreateThread(function()
 
     while true do
 
         local sleep = 500
-
         local ped = PlayerPedId()
-
         local coords = GetEntityCoords(ped)
 
         local inZone = false
 
         for _, z in pairs(zones) do
 
-            if z.enabled then
+            if z.enabled and z.coords then
 
                 local zc = vector3(
                     z.coords.x,
@@ -374,11 +434,8 @@ CreateThread(function()
                 if dist < z.radius then
 
                     blockedWeapon = true
-
                     inZone = true
-
                     sleep = 1
-
                     currentZone = z
 
                     if not inside then
@@ -408,7 +465,6 @@ CreateThread(function()
         if not inZone and inside then
 
             inside = false
-
             currentZone = nil
 
             TriggerEvent(
@@ -428,8 +484,9 @@ CreateThread(function()
     end
 
 end)
-
-
+-------------------------------------------------
+-- نظام منع الأسلحة
+-------------------------------------------------
 CreateThread(function()
 
     while true do
@@ -447,12 +504,17 @@ CreateThread(function()
                 PlayerData.job and
                 PlayerData.job.name
 
-
+            -------------------------------------------------
+            -- إذا الوظيفة غير مسموحة
+            -------------------------------------------------
             if not Config.AllowedJobs[job] then
 
                 local weapon =
                     GetSelectedPedWeapon(ped)
 
+                -------------------------------------------------
+                -- تعطيل التحكمات
+                -------------------------------------------------
                 DisableControlAction(0, 24, true)
                 DisableControlAction(0, 25, true)
                 DisableControlAction(0, 37, true)
@@ -469,16 +531,24 @@ CreateThread(function()
                 DisableControlAction(0, 263, true)
                 DisableControlAction(0, 264, true)
 
-
+                -------------------------------------------------
+                -- إذا يحمل سلاح غير مسموح
+                -------------------------------------------------
                 if weapon ~= `WEAPON_UNARMED`
                 and not Config.AllowedWeapons[weapon] then
 
+                    -------------------------------------------------
+                    -- إزالة السلاح
+                    -------------------------------------------------
                     SetCurrentPedWeapon(
                         ped,
                         `WEAPON_UNARMED`,
                         true
                     )
 
+                    -------------------------------------------------
+                    -- منع الإطلاق
+                    -------------------------------------------------
                     DisablePlayerFiring(
                         PlayerId(),
                         true
@@ -490,6 +560,9 @@ CreateThread(function()
     end
 end)
 
+-------------------------------------------------
+-- منع استخدام العناصر
+-------------------------------------------------
 CreateThread(function()
 
     while true do
@@ -519,7 +592,9 @@ CreateThread(function()
     end
 end)
 
-
+-------------------------------------------------
+-- EXPORT
+-------------------------------------------------
 exports('IsInGreenZone', function(coords)
 
     coords =
@@ -528,7 +603,7 @@ exports('IsInGreenZone', function(coords)
 
     for _, z in pairs(zones) do
 
-        if z.enabled then
+        if z.enabled and z.coords then
 
             local zc = vector3(
                 z.coords.x,
@@ -545,5 +620,51 @@ exports('IsInGreenZone', function(coords)
     end
 
     return false, nil
+
+end)
+
+
+
+RegisterNetEvent("greenzone:createBlipMenu", function()
+
+    local input = exports['qb-input']:ShowInput({
+        header = "Create Blip GreenZone",
+        submitText = "Create",
+
+        inputs = {
+
+            {
+                text = "Save Name",
+                name = "name",
+                type = "text",
+                isRequired = true
+            },
+
+            {
+                text = "Blip ID",
+                name = "blip",
+                type = "number",
+                isRequired = true
+            },
+
+            {
+                text = "Radius",
+                name = "radius",
+                type = "number",
+                isRequired = true
+            }
+        }
+    })
+
+    if not input then return end
+
+    TriggerServerEvent(
+        "greenzone:createBlip",
+        {
+            name = input.name,
+            blipId = tonumber(input.blip),
+            radius = tonumber(input.radius)
+        }
+    )
 
 end)

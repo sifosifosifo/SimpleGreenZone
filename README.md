@@ -1,63 +1,216 @@
-# Sifo GreenZone
+<p align="center">
+  <img src="./preview/banner.png" width="100%" alt="Green Zone System Banner">
+</p>
 
-Simple Green Zone System for QBCore.
+<h1 align="center">🟢 Green Zone System</h1>
 
-![Preview](preview.png)
+<p align="center">
+Advanced Green Zone System for QBCore with support for Waypoint Zones and Blip Zones.
+</p>
 
-## Features
+<p align="center">
+    <img src="https://img.shields.io/badge/QBCore-Supported-green">
+    <img src="https://img.shields.io/badge/FiveM-Ready-blue">
+    <img src="https://img.shields.io/badge/Version-2.0-brightgreen">
+    <img src="https://img.shields.io/badge/License-All%20Rights%20Reserved-red">
+</p>
 
-- Create Green Zones using waypoint
-- Save zones in database
-- Enable / Disable zones
-- Delete zones
-- Edit zone radius
-- HUD support
-- Export support
-- Multi-language support
-- Weapon restrictions
-- Allowed jobs system
-- Blocked items system
+---
 
-## Dependencies
+# ✨ Features
+
+- 📍 Create Green Zones using waypoints.
+- 🗺️ Create Green Zones using Blip IDs.
+- 🏪 Automatically create zones for all matching locations.
+- 🔫 Disable weapons inside Green Zones.
+- 👊 Disable melee attacks.
+- 💾 Database support.
+- 📏 Edit zone radius.
+- 🟢 Enable / Disable zones.
+- 🗑️ Delete zones.
+- 👮 Permission system.
+- 🌍 Multi-language support.
+- 🖥️ HUD support.
+- 🔌 Export support.
+- ⚡ Unlimited zones support.
+- 🎮 Fully managed in-game using `/gz`.
+
+---
+
+# 🆕 Blip Zone System
+
+The new Blip Zone system allows you to create a single Green Zone entry that automatically applies to all matching locations.
+
+Example:
+
+```text
+Name: Clothing Stores
+Blip ID: 73
+Radius: 100
+```
+
+Result:
+
+- Ponsonbys
+- Sub Urban
+- Binco
+- Any other clothing store using the same blip ID
+
+Manage them all from a single menu entry.
+
+---
+
+# 🎮 Usage
+
+Open the menu:
+
+```text
+/gz
+```
+
+Available options:
+
+```text
+Create Waypoint Zone
+Create Blip Zone
+Manage Zones
+```
+
+---
+
+## Create Waypoint Zone
+
+1. Run:
+
+```text
+/gz
+```
+
+2. Select:
+
+```text
+Create Waypoint Zone
+```
+
+3. Set:
+
+- Zone name
+- Radius
+
+4. Place your waypoint and confirm.
+
+---
+
+## Create Blip Zone
+
+1. Run:
+
+```text
+/gz
+```
+
+2. Select:
+
+```text
+Create Blip Zone
+```
+
+3. Enter:
+
+- Zone Name
+- Blip ID
+- Radius
+
+Example:
+
+```text
+Name: Clothing Stores
+Blip ID: 73
+Radius: 100
+```
+
+The system will automatically protect every location using that blip.
+
+---
+
+# 📚 Finding Blip IDs
+
+You can find all available FiveM Blip IDs here:
+
+:contentReference[oaicite:0]{index=0}
+
+Alternative reference:
+
+:contentReference[oaicite:1]{index=1}
+
+These references contain all map icons and their IDs that can be used with Blip Zones. :contentReference[oaicite:2]{index=2}
+
+---
+
+# ⚙️ Dependencies
 
 - qb-core
 - qb-menu
 - qb-input
 - oxmysql
 
-## Installation
+---
 
-1. Put the script inside your resources folder.
+# 🚀 Installation
 
-2. Add this to your server.cfg:
+Place the resource inside your resources folder:
 
-```cfg
-ensure redzone
+```text
+resources/[standalone]/greenzone
 ```
 
-3. Restart your server.
+Add to your `server.cfg`:
 
-## Admin Permissions
+```cfg
+ensure greenzone
+```
 
-Add this inside server.cfg:
+---
+
+# 🔐 Permissions
+
+Add to your `server.cfg`:
 
 ```cfg
 add_ace group.admin greenzone.admin allow
 add_ace group.god greenzone.admin allow
 ```
 
-## How The Script Works
+---
 
-- Administrators can create safe zones using the `/gz` command.
-- A waypoint is placed on the map.
-- Press `E` to create the zone.
-- Players inside the zone cannot use restricted weapons.
-- Allowed jobs can still use weapons inside the zone.
-- All zones are saved automatically in the database.
+# 🗄️ Database Structure
 
-## HUD Integration
+```sql
+CREATE TABLE IF NOT EXISTS greenzones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    type VARCHAR(20) DEFAULT 'coords',
+    blip_id INT DEFAULT NULL,
+    x DOUBLE DEFAULT NULL,
+    y DOUBLE DEFAULT NULL,
+    z DOUBLE DEFAULT NULL,
+    radius INT,
+    enabled INT DEFAULT 1
+);
+```
 
-The script sends this event:
+---
+
+# 📍 Supported Zone Types
+
+| Type | Description |
+|------|-------------|
+| coords | Traditional waypoint zone |
+| blip | Automatically generated zones from matching blips |
+
+---
+
+# 🖥️ HUD Integration
 
 ```lua
 AddEventHandler('hud:zoneStatus', function(status, zoneName)
@@ -69,40 +222,64 @@ AddEventHandler('hud:zoneStatus', function(status, zoneName)
 end)
 ```
 
-## Export
+---
+
+# 🔌 Export Example
 
 ```lua
-local inside, zone = exports['redzone']:IsInGreenZone()
+local inZone, zone = exports['greenzone']:IsInGreenZone()
+
+if inZone then
+    print("Player is inside:", zone.name)
+end
 ```
 
-## Config
+---
 
-### Change Language
+# 📷 Preview
 
-```lua
-Config.Locale = 'en'
+Place your promotional image here:
+
+```text
+greenzone/
+│
+├── preview/
+│   └── banner.png
+│
+├── client/
+├── server/
+├── config.lua
+├── fxmanifest.lua
+└── README.md
 ```
 
-### Disable Notifications
+The image will automatically appear at the top of the GitHub page.
 
-```lua
-Config.EnableZoneNotify = false
+---
+
+# 🔒 License
+
+This resource is distributed under:
+
+```text
+All Rights Reserved
 ```
 
-### Allowed Jobs
+You may:
 
-```lua
-Config.AllowedJobs = {
-    ["police"] = true,
-    ["ambulance"] = true
-}
-```
+- Use the resource on your server.
+- Modify configuration files if allowed.
 
-### Allowed Weapons
+You may NOT:
 
-```lua
-Config.AllowedWeapons = {
-    [`WEAPON_STUNGUN`] = true
-}
-```
+- Redistribute the resource.
+- Resell the resource.
+- Share the source code.
+- Claim ownership of the resource.
+- Publish modified versions without permission.
 
+---
+
+# ❤️ Support
+
+If you find a bug or have a feature request, open an issue on GitHub.

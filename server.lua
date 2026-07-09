@@ -2,25 +2,32 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 local zones = {}
 
-
+-------------------------------------------------
+-- إنشاء SQL تلقائي
+-------------------------------------------------
 CreateThread(function()
 
     MySQL.query.await([[
         CREATE TABLE IF NOT EXISTS greenzones (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(50),
-            x DOUBLE,
-            y DOUBLE,
-            z DOUBLE,
-            radius INT,
-            enabled INT DEFAULT 1
-        )
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    type VARCHAR(20) DEFAULT 'coords',
+    blip_id INT DEFAULT NULL,
+    x DOUBLE DEFAULT NULL,
+    y DOUBLE DEFAULT NULL,
+    z DOUBLE DEFAULT NULL,
+    radius INT,
+    enabled INT DEFAULT 1
+)
     ]])
 
     print('[GreenZone] SQL Ready')
 
 end)
 
+-------------------------------------------------
+-- التحقق من الأدمن
+-------------------------------------------------
 local function IsAdmin(src)
 
     if QBCore.Functions.HasPermission(src, "admin") then
@@ -50,7 +57,9 @@ local function IsAdmin(src)
     return false
 end
 
-
+-------------------------------------------------
+-- Callback
+-------------------------------------------------
 QBCore.Functions.CreateCallback(
     'greenzone:isAdmin',
 
@@ -59,7 +68,9 @@ QBCore.Functions.CreateCallback(
     end
 )
 
-
+-------------------------------------------------
+-- تحميل المناطق
+-------------------------------------------------
 CreateThread(function()
 
     Wait(2000)
@@ -72,26 +83,29 @@ CreateThread(function()
 
     for _, z in pairs(result) do
 
-        table.insert(zones, {
+table.insert(zones, {
 
-            id = z.id,
+    id = z.id,
+    name = z.name,
 
-            name = z.name,
+    type = z.type or "coords",
 
-            coords = vector3(
-                z.x,
-                z.y,
-                z.z
-            ),
+    blipId = z.blip_id,
 
-            radius = z.radius,
+    coords =
+        z.x and vector3(
+            z.x,
+            z.y,
+            z.z
+        ) or nil,
 
-            enabled =
-                z.enabled == true
-                or z.enabled == 1
-                or z.enabled == "1"
+    radius = z.radius,
 
-        })
+    enabled =
+        z.enabled == true
+        or z.enabled == 1
+        or z.enabled == "1"
+})
 
     end
 
@@ -99,7 +113,9 @@ CreateThread(function()
 
 end)
 
-
+-------------------------------------------------
+-- إرسال المناطق
+-------------------------------------------------
 RegisterNetEvent("greenzone:requestZones", function()
 
     TriggerClientEvent(
@@ -110,7 +126,9 @@ RegisterNetEvent("greenzone:requestZones", function()
 
 end)
 
-
+-------------------------------------------------
+-- إنشاء منطقة
+-------------------------------------------------
 RegisterNetEvent("greenzone:create", function(data)
 
     local src = source
@@ -159,7 +177,9 @@ RegisterNetEvent("greenzone:create", function(data)
 
 end)
 
-
+-------------------------------------------------
+-- حذف منطقة
+-------------------------------------------------
 RegisterNetEvent("greenzone:delete", function(id)
 
     local src = source
@@ -192,6 +212,9 @@ RegisterNetEvent("greenzone:delete", function(id)
 
 end)
 
+-------------------------------------------------
+-- تعديل Radius
+-------------------------------------------------
 RegisterNetEvent("greenzone:updateRadius", function(id, radius)
 
     local src = source
@@ -227,7 +250,9 @@ RegisterNetEvent("greenzone:updateRadius", function(id, radius)
 
 end)
 
-
+-------------------------------------------------
+-- تعطيل / تفعيل
+-------------------------------------------------
 RegisterNetEvent("greenzone:toggle", function(id)
 
     local src = source
@@ -263,6 +288,9 @@ RegisterNetEvent("greenzone:toggle", function(id)
 
 end)
 
+-------------------------------------------------
+-- حذف العناصر الممنوعة
+-------------------------------------------------
 RegisterNetEvent(
     'greenzone:removeBlockedItem',
 
@@ -294,3 +322,42 @@ RegisterNetEvent(
         end
     end
 )
+
+
+RegisterNetEvent("greenzone:createBlip", function(data)
+
+    local src = source
+
+    if not IsAdmin(src) then
+        return
+    end
+
+    local id = MySQL.insert.await([[
+        INSERT INTO greenzones
+        (name, type, blip_id, radius, enabled)
+        VALUES (?, ?, ?, ?, ?)
+    ]], {
+        data.name,
+        "blip",
+        data.blipId,
+        data.radius,
+        1
+    })
+
+table.insert(zones,{
+    id = id,
+    name = data.name,
+    type = "blip",
+    blipId = data.blipId,
+    coords = nil,
+    radius = data.radius,
+    enabled = true
+})
+
+    TriggerClientEvent(
+        "greenzone:update",
+        -1,
+        zones
+    )
+
+end)

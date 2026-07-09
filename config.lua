@@ -1,20 +1,30 @@
 Config = {}
 
--- Language
-Config.Locale = 'en' -- en, es, fr, ar,
+-------------------------------------------------
+-- اللغة
+-------------------------------------------------
+Config.Locale = "ar"
 
--- Notifications
-Config.EnableZoneNotify = true -- Send a notification when entering or leaving a green zone that supports 'qb-notification'
+-------------------------------------------------
+-- تفعيل الرسائل
+-------------------------------------------------
+Config.EnableZoneNotify = false
 
--- Allowed Licenses
+-------------------------------------------------
+-- الرخص المسموح لها
+-------------------------------------------------
 Config.AllowedLicenses = {
-    "license:YOUR_LICENSE" --If you do not add the permissions in server.cfg
+    "license:YOUR_LICENSE"
 }
 
--- Disable Weapons In GreenZone
-Config.DisableWeapons = true -- Disable weapons in green zones
+-------------------------------------------------
+-- منع الأسلحة داخل المنطقة
+-------------------------------------------------
+Config.DisableWeapons = false
 
--- Allowed Jobs
+-------------------------------------------------
+-- الوظائف المسموح لها بحمل السلاح
+-------------------------------------------------
 Config.AllowedJobs = {
 
     ["police"] = true,
@@ -22,19 +32,23 @@ Config.AllowedJobs = {
 
 }
 
--- Allowed Weapons
+-------------------------------------------------
+-- الأسلحة المسموحة دائمًا
+-------------------------------------------------
 Config.AllowedWeapons = {
 
-    [`WEAPON_STUNGUN`] = true,
     [`WEAPON_NIGHTSTICK`] = true,
     [`WEAPON_FLASHLIGHT`] = true,
 
 }
 
--- Blocked Items
+-------------------------------------------------
+-- العناصر الممنوعة
+-------------------------------------------------
 Config.BlockedItems = {
 
     ["lockpick"] = true,
-    ["weapon_pistol"] = true,
+    ["advancedlockpick"] = true,
+    ["weapon_knife"] = true,
 
 }

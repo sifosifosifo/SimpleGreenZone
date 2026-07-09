@@ -3,8 +3,17 @@ game 'gta5'
 
 lua54 'yes'
 
-author 'SIFO'
-description 'Simple Green Zone System'
+author 'Sifo'
+description 'Advanced Green Zone System'
+version     '1.1'
+
+files {
+    'README.md',
+    'config.lua',
+    'client.lua',
+    'server.lua',
+    'locales/*.lua'
+}
 
 shared_scripts {
     '@qb-core/shared/locale.lua',
@@ -19,4 +28,9 @@ client_scripts {
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server.lua'
+}
+
+escrow_ignore {
+    'config.lua',
+    'locales/*.lua'
 }
