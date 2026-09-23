@@ -2,18 +2,37 @@
   <img src="./preview/banner.png" width="100%" alt="Green Zone System Banner">
 </p>
 
-<h1 align="center">🟢 Green Zone System</h1>
+<h1 align="center">🟢 Green Zone System for FiveM QBCore</h1>
 
 <p align="center">
-Advanced Green Zone System for QBCore with support for Waypoint Zones and Blip Zones.
+Advanced FiveM Green Zone script for QBCore with Waypoint Zones, Blip Zones, permissions, database support, HUD integration, and exports.
 </p>
 
-<p align="center">
-    <img src="https://img.shields.io/badge/QBCore-Supported-green">
-    <img src="https://img.shields.io/badge/FiveM-Ready-blue">
-    <img src="https://img.shields.io/badge/Version-2.0-brightgreen">
-    <img src="https://img.shields.io/badge/License-All%20Rights%20Reserved-red">
-</p>
+<div align="center">
+
+# 🛒 SIFO STORE
+
+### 🚀 Premium FiveM Scripts & Resources
+
+Looking for more **FiveM QBCore scripts, resources, systems and add-ons** for your server?
+
+<a href="https://sifo.tebex.store/" target="_blank">
+  <img src="https://img.shields.io/badge/🛍️%20VISIT%20SIFO%20STORE-FF6B00?style=for-the-badge&logo=shopify&logoColor=white" alt="Visit SIFO Store">
+</a>
+
+<br><br>
+
+**SIFO STORE:** https://sifo.tebex.store/
+
+</div>
+
+---
+
+## 🔎 About This FiveM Script
+
+**SimpleGreenZone** is a configurable **FiveM QBCore Green Zone script** designed for roleplay servers. Create protected areas using map waypoints or blip IDs, manage zones in-game, and control combat inside configured areas.
+
+**Keywords:** FiveM, FiveM scripts, QBCore, QBCore scripts, Green Zone, Safe Zone, FiveM Green Zone, FiveM Safe Zone, GTA 5 RP, QBCore resource, FiveM roleplay, Lua, oxmysql.
 
 ---
 
@@ -80,46 +99,21 @@ Manage Zones
 
 ## Create Waypoint Zone
 
-1. Run:
-
-```text
-/gz
-```
-
-2. Select:
-
-```text
-Create Waypoint Zone
-```
-
-3. Set:
-
-- Zone name
-- Radius
-
+1. Run `/gz`
+2. Select **Create Waypoint Zone**
+3. Set the zone name and radius.
 4. Place your waypoint and confirm.
 
 ---
 
 ## Create Blip Zone
 
-1. Run:
-
-```text
-/gz
-```
-
-2. Select:
-
-```text
-Create Blip Zone
-```
-
+1. Run `/gz`
+2. Select **Create Blip Zone**
 3. Enter:
-
-- Zone Name
-- Blip ID
-- Radius
+   - Zone Name
+   - Blip ID
+   - Radius
 
 Example:
 
@@ -138,6 +132,7 @@ The system will automatically protect every location using that blip.
 You can find all available FiveM Blip IDs here:
 
 https://docs.fivem.net/docs/game-references/blips/
+
 ---
 
 # ⚙️ Dependencies
@@ -238,15 +233,12 @@ greenzone/
 │
 ├── preview/
 │   └── banner.png
-│
 ├── client/
 ├── server/
 ├── config.lua
 ├── fxmanifest.lua
 └── README.md
 ```
-
-The image will automatically appear at the top of the GitHub page.
 
 ---
 
@@ -275,4 +267,8 @@ You may NOT:
 
 # ❤️ Support
 
-If you find a bug or have a feature request, open an issue on GitHub.
+For bugs or feature requests, open an issue on GitHub.
+
+For more **FiveM scripts and QBCore resources**, visit:
+
+**https://sifo.tebex.store/**
